@@ -1,0 +1,17 @@
+# Pinned to modern floor versions with Python 3.13 wheels.
+# The original notebook pinned 2023-era versions (transformers==4.31.0,
+# trl==0.4.7, peft==0.4.0, accelerate==0.21.0) which predate cp313 wheels
+# and use an older SFTTrainer/TrainingArguments API. These floors are the
+# oldest versions known to (a) ship cp313 wheels and (b) work with the
+# SFTConfig-based training code in scripts/train.py.
+
+torch>=2.4.0
+transformers>=4.44.0
+accelerate>=0.33.0
+peft>=0.12.0
+trl>=0.9.6
+bitsandbytes>=0.49.2
+datasets>=2.20.0
+huggingface_hub>=0.24.0
+pyyaml>=6.0
+tensorboard>=2.17.0

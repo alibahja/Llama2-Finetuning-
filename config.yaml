@@ -1,0 +1,54 @@
+# Configuration for QLoRA fine-tuning of Llama 2.
+# All values mirror the defaults from the original Colab notebook.
+
+model:
+  name: "NousResearch/Llama-2-7b-chat-hf"   # Base model on the HF Hub
+  new_model_name: "Llama-2-7b-chat-finetune" # Name for the fine-tuned adapter/model
+
+dataset:
+  name: "mlabonne/guanaco-llama2-1k"
+  text_field: "text"
+  split: "train"
+
+lora:
+  r: 64                # LoRA attention dimension
+  alpha: 16             # Scaling parameter
+  dropout: 0.1          # Dropout probability for LoRA layers
+
+bnb:
+  use_4bit: true
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_quant_type: "nf4"
+  use_nested_quant: false
+
+training:
+  output_dir: "./results"
+  num_train_epochs: 1
+  fp16: false
+  bf16: false
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 1
+  gradient_checkpointing: true
+  max_grad_norm: 0.3
+  learning_rate: 2.0e-4
+  weight_decay: 0.001
+  optim: "paged_adamw_32bit"
+  lr_scheduler_type: "cosine"
+  max_steps: -1
+  warmup_ratio: 0.03
+  group_by_length: true
+  save_steps: 25
+  logging_steps: 25
+  logging_dir: "./results/logs"
+
+sft:
+  max_seq_length: null   # null -> let SFTConfig infer / no explicit cap
+  packing: false
+
+  # "" -> load the entire model on GPU 0. Use "auto" for multi-GPU dispatch.
+device_map: {"": 0}
+
+inference:
+  max_length: 200
+  default_prompt: "What is a large language model?"

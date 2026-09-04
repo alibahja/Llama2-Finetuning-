@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Env / secrets
+.env
+*.token
+
+# Training artifacts
+results/checkpoints/*
+!results/checkpoints/.gitkeep
+results/logs/*
+!results/logs/.gitkeep
+results/runs/
+*.safetensors
+*.bin
+*.pt
+Llama-2-7b-chat-finetune/
+Llama-2-7b-chat-finetune-merged/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
