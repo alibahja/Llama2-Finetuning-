@@ -87,14 +87,6 @@ All hyperparameters live in `config.yaml`: base model, dataset, LoRA (`r`, `alph
 4-bit quantization (`bnb`), `TrainingArguments`-equivalent fields, and SFT settings
 (`max_seq_length`, `packing`). Edit this file rather than the scripts to change behavior.
 
-## Notes on Python 3.13 compatibility
-
-The original notebook pinned 2023-era versions (`transformers==4.31.0`, `trl==0.4.7`,
-`peft==0.4.0`, `accelerate==0.21.0`) that predate Python 3.13 wheels, and used an older
-`SFTTrainer` API. `requirements.txt` here uses modern floor versions with cp313 wheels, and
-`scripts/train.py` uses the current `trl` API: hyperparameters that used to live directly on
-`SFTTrainer` (`max_seq_length`, `packing`, `dataset_text_field`) now live on `SFTConfig`, and
-the `tokenizer=` kwarg was renamed to `processing_class=`.
 
 ## License
 
