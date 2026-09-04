@@ -95,7 +95,7 @@ def build_sft_config(cfg: dict) -> SFTConfig:
         optim=t["optim"],
         save_steps=t["save_steps"],
         logging_steps=t["logging_steps"],
-        logging_dir=t["logging_dir"],
+        #logging_dir=t["logging_dir"],
         learning_rate=t["learning_rate"],
         weight_decay=t["weight_decay"],
         fp16=t["fp16"],
