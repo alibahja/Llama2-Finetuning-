@@ -26,8 +26,8 @@ training:
   num_train_epochs: 1
   fp16: false
   bf16: false
-  per_device_train_batch_size: 4
-  per_device_eval_batch_size: 4
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
   gradient_accumulation_steps: 1
   gradient_checkpointing: true
   max_grad_norm: 0.3
@@ -43,7 +43,7 @@ training:
   logging_dir: "./results/logs"
 
 sft:
-  max_seq_length: null   # null -> let SFTConfig infer / no explicit cap
+  max_seq_length: 512   # null -> let SFTConfig infer / no explicit cap
   packing: false
 
   # "" -> load the entire model on GPU 0. Use "auto" for multi-GPU dispatch.
