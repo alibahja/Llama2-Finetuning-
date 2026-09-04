@@ -107,7 +107,7 @@ def build_sft_config(cfg: dict) -> SFTConfig:
         #lr_scheduler_type=t["lr_scheduler_type"],
         report_to="tensorboard",
         dataset_text_field=cfg["dataset"]["text_field"],
-        max_seq_length=s["max_seq_length"],
+        max_length=s["max_seq_length"],
         packing=s["packing"],
     )
 
