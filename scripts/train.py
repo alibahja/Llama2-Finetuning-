@@ -102,7 +102,7 @@ def build_sft_config(cfg: dict) -> SFTConfig:
         bf16=t["bf16"],
         max_grad_norm=t["max_grad_norm"],
         max_steps=t["max_steps"],
-        warmup_ratio=t["warmup_ratio"],
+        #warmup_ratio=t["warmup_ratio"],
         group_by_length=t["group_by_length"],
         lr_scheduler_type=t["lr_scheduler_type"],
         report_to="tensorboard",
