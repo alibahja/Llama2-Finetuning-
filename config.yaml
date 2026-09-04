@@ -2,53 +2,69 @@
 # All values mirror the defaults from the original Colab notebook.
 
 model:
+  #The pretrained model that we're starting with. It is a 7 billion parameter Llama 2 model that has been fine-tuned for chat.
   name: "NousResearch/Llama-2-7b-chat-hf"   # Base model on the HF Hub
+  # what we will name our fine-tuned model after training.
   new_model_name: "Llama-2-7b-chat-finetune" # Name for the fine-tuned adapter/model
 
 dataset:
+  # Dataset from Hugging Face Hub. it has high quality instruction data with 1000 examples.
   name: "mlabonne/guanaco-llama2-1k"
+  # The column name in the dataset that contains the text/training data.
   text_field: "text"
+  #Which split of the dataset to use (train/validation/test).
   split: "train"
 
 lora:
+  #The rank of the low-rank matrices. Higher = more trainable parameters, more capacity, but more memory. 64 is relatively high.
   r: 64                # LoRA attention dimension
+  # Scaling factor. Controls how much LoRA affects the original weights. alpha/r = scaling (16/64 = 0.25)
   alpha: 16             # Scaling parameter
+  # Randomly drops 10% of neurons during training to prevent overfitting.
   dropout: 0.1          # Dropout probability for LoRA layers
 
+# QLoRA quantization settings. These settings control how the model weights are quantized to reduce memory usage
 bnb:
+  # Enables 4-bit quantization - compresses model weights from 16-bit to 4-bit, saving ~75% memory.
   use_4bit: true
+  # The precision used during computations. float16 is good for speed/memory balance.
   bnb_4bit_compute_dtype: "float16"
+  # Quantization method. nf4 = Normal Float 4-bit, optimized for normal distributions.
   bnb_4bit_quant_type: "nf4"
+  # Double quantization (quantize the quantization constants) - saves more memory but slower.
   use_nested_quant: false
 
 training:
-  output_dir: "./results"
-  num_train_epochs: 1
-  fp16: false
-  bf16: false
-  per_device_train_batch_size: 1
-  per_device_eval_batch_size: 1
-  gradient_accumulation_steps: 1
-  gradient_checkpointing: true
-  max_grad_norm: 0.3
-  learning_rate: 2.0e-4
-  weight_decay: 0.001
-  optim: "paged_adamw_32bit"
-  lr_scheduler_type: "cosine"
-  max_steps: -1
-  warmup_ratio: 0.03
-  group_by_length: true
-  save_steps: 25
+  output_dir: "./results" # where to save the results of the fine-tuning.
+  num_train_epochs: 1  # Train through entire dataset once.
+  fp16: false #Mixed precision training. fp16 is faster but less stable, bf16 is better but needs newer GPUs.
+  bf16: false 
+  per_device_train_batch_size: 1 #  Process ONE sample per GPU at a time. Very small to fit 7B model in memory.
+  per_device_eval_batch_size: 1  # Process ONE sample per GPU at a time. Very small to fit 7B model in memory.
+  gradient_accumulation_steps: 1 # How many batches to accumulate before updating weights. Useful for simulating 
+  # larger batch size when memory is limited.
+  gradient_checkpointing: true # Saves memory by recomputing activations instead of storing them (slower but memory efficient).
+  max_grad_norm: 0.3 # Gradient clipping - prevents exploding gradients.
+  learning_rate: 2.0e-4 # How much to adjust weights per step. Standard for fine-tuning.
+  weight_decay: 0.001 #  L2 regularization - prevents overfitting
+  optim: "paged_adamw_32bit" # Memory-efficient optimizer from bitsandbytes that offloads to CPU when memory is full.
+  lr_scheduler_type: "cosine" # Learning rate decreases following a cosine curve (starts high, gradually lowers)
+  max_steps: -1 # Train for all steps until epochs complete (-1 means use epochs).
+  warmup_ratio: 0.03 # First 3% of training gradually increases LR from 0 to target.
+  group_by_length: true # Groups similar-length sequences to reduce padding waste.
+  save_steps: 25 # Save model checkpoint every 25 steps. Useful for resuming training or evaluating intermediate models.
   logging_steps: 25
   logging_dir: "./results/logs"
 
+# (Supervised Fine-Tuning) SFT settings. These control how the model is trained on the dataset.
 sft:
-  max_seq_length: 512   # null -> let SFTConfig infer / no explicit cap
-  packing: false
-
+  max_seq_length: 512   # Cut sequences to 512 tokens to save memory. Llama's context is 4096, but shorter = faster.
+  packing: false # Don't combine multiple short sequences into one.
+  
+  # Force all model layers onto GPU 0. "auto" would distribute across GPUs.
   # "" -> load the entire model on GPU 0. Use "auto" for multi-GPU dispatch.
 device_map: {"": 0}
-
+# Settings for when you test the model after training.
 inference:
   max_length: 200
   default_prompt: "What is a large language model?"
